@@ -15,16 +15,13 @@ namespace WineFix
         public const string PluginId = "winefix";
         public const string ColorPickerMagnifierFixKey = "color_picker_magnifier_fix";
         public const string ColorPickerModeKey = "color_picker_sampling_mode";
-        public const string BezierRenderingFixKey = "bezier_rendering_fix";
-        public const string CollinearJoinFixKey = "collinear_join_fix";
         public const string SettingForceSyncFontEnum = "force_sync_font_enum";
         public const string SettingCanvaSignInHelper = "canva_sign_in_helper";
-        public const string SettingWidenStubFix = "widen_stub_fix";
-        public const string SettingBezierSplitGuard = "bezier_split_guard";
         public const string SettingCommandLineFileOpen = "command_line_file_open";
         public const string SettingPinPluginHost = "pin_plugin_host";
         public const string SettingContextBarItemStyle = "context_bar_item_style_fix";
         public const string SettingSubToolColumns = "sub_tool_columns_fix";
+        public const string SettingMainWindowLoaded = "main_window_loaded_fix";
 
         public override PluginSettingsDefinition DefineSettings()
         {
@@ -34,22 +31,6 @@ namespace WineFix
                     defaultValue: true,
                     restartRequired: true,
                     description: "Patch the Canva sign-in dialog to include a helper textbox input and instructions to complete Canva sign-in without needing a protocol URL handler.")
-                .AddBool(BezierRenderingFixKey, "Bezier curves: Fix tool preview path rendering",
-                    defaultValue: true,
-                    restartRequired: true,
-                    description: "Apply patch to subdivide cubic bezier curves into quadratic segments for more accurate preview path rendering (eg. pen tool)")
-                .AddBool(CollinearJoinFixKey, "Bezier curves: Fix collinear subdivision flicker artifacts",
-                    defaultValue: true,
-                    restartRequired: true,
-                    description: "Apply patch to fix tangent line flicker artifacts between collinear bezier curve subdivisions.")
-                .AddBool(SettingWidenStubFix, "Stroked paths: Prevent freeze on Widen",
-                    defaultValue: true,
-                    restartRequired: true,
-                    description: "Stub the unimplemented ID2D1PathGeometry::Widen method to return an empty geometry instead of E_NOTIMPL. Prevents Affinity from hanging when clicking stroked SVG vectors. Stroke rendering will be absent but the app remains usable.")
-                .AddBool(SettingBezierSplitGuard, "Bezier curves: Prevent freeze on complex paths",
-                    defaultValue: true,
-                    restartRequired: true,
-                    description: "Guard against runaway recursion in Wine's bezier intersection code. Prevents Affinity from hanging when editing complex vector paths (e.g. embedded SVGs with overlapping bezier curves).")
                 .AddEnum(ColorPickerMagnifierFixKey, "Color picker: Wayland zoom magnifier fix",
                     new List<EnumOption>
                     {
@@ -80,6 +61,10 @@ namespace WineFix
                     defaultValue: true,
                     restartRequired: true,
                     description: "A studio switch gives the sub-tool panel the main tool pane's column count, so with a one-column tool pane the shape tools come back as one column running the height of the window until the next tool change. Put back the sub-tool panel's own rule (two columns for more than ten sub-tools) after a studio switch.")
+                .AddBool(SettingMainWindowLoaded, "Settings: Save preferences on exit",
+                    defaultValue: true,
+                    restartRequired: true,
+                    description: "Affinity's package check throws under Wine, which stops it saving preferences on exit. Answer the check with \"no previous package\" instead. On Affinity 3.2.3 this opens the WebView2 onboarding page, which crashes; turn it off there.")
                 .AddSection("Crash Fixes")
                 .AddBool(SettingForceSyncFontEnum, "Force synchronous font enumeration",
                     defaultValue: true,
@@ -112,31 +97,16 @@ namespace WineFix
                     h => Patches.CommandLineFileOpenPatch.ApplyPatches(h));
             }
 
-            // Since these patch native code that we load ourselves,
-            // we don't need to apply these with the defferal logic.
-            if (context.Settings.GetEffectiveValue<bool>(BezierRenderingFixKey))
-            {
-                Patches.BezierRenderingPatch.Apply();
-            }
 
-            if (context.Settings.GetEffectiveValue<bool>(CollinearJoinFixKey))
+            if (context.Settings.GetEffectiveValue<bool>(SettingMainWindowLoaded))
             {
-                Patches.CollinearJoinPatch.Apply();
+                context.Patch("MainWindowLoaded fix",
+                    h => Patches.MainWindowLoadedPatch.ApplyPatches(h));
             }
-
-            if (context.Settings.GetEffectiveValue<bool>(SettingWidenStubFix))
+            else
             {
-                Patches.WidenStubPatch.Apply();
+                Logger.Info("Skipping MainWindowLoaded fix (setting: disabled)");
             }
-
-            if (context.Settings.GetEffectiveValue<bool>(SettingBezierSplitGuard))
-            {
-                Patches.BezierSplitGuardPatch.Apply();
-                Patches.BezierSplitBudgetPatch.Apply();
-            }
-
-            context.Patch("MainWindowLoaded fix",
-                h => Patches.MainWindowLoadedPatch.ApplyPatches(h));
 
             if (context.Settings.GetEffectiveValue<bool>(SettingContextBarItemStyle))
             {

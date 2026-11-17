@@ -14,10 +14,7 @@ For detailed instructions, see the [WineFix Installation Guide](https://apl.ncur
 
 ## Included Patches
 
-- **Bezier rendering fix** — Cubic Bézier curves render incorrectly under Wine. Fixed by hooking the `ID2D1GeometrySink` COM vtable to subdivide cubic Béziers into quadratics at runtime using adaptive De Casteljau subdivision. Works across all Wine versions.
-- **Collinear join fix** — Spike artifacts appear at smooth curve joins after Bézier subdivision. Fixed by patching d2d1.dll in memory to zero the erroneous 25-unit vertex offset for collinear outline joins.
-- **Widen stub fix** — Affinity can hang when interacting with stroked SVG vectors because Wine's `ID2D1PathGeometry::Widen` returns `E_NOTIMPL`. Fixed by hooking the vtable to return an empty geometry instead.
-- **Bezier split recursion/budget fix** — Affinity hangs on complex vector paths (e.g. embedded SVGs with overlapping Bézier curves) due to unbounded recursion and splitting in Wine's geometry processing. Fixed by detouring the recursion and split functions with guards that cap recursion depth and total splits.
+- **Direct2D geometry fixes** (Bézier rendering, collinear joins, Widen, split recursion) — no longer here. The Affinity Wine builds fix them in d2d1 itself, and the in-memory hooks found the wrong function in those builds.
 - **Preferences save fix** — Preferences fail to save on application exit. Fixed via Harmony transpiler replacing `HasPreviousPackageInstalled()` with `false`.
 - **Color picker Wayland fix** — Color picker zoom preview displays a black image on Wayland. Fixed by patching the magnifier capture to use Wine's window capture instead of screen capture.
 - **Font enumeration fix** — Intermittent startup crash from parallel font enumeration. Fixed by forcing synchronous font loading.
