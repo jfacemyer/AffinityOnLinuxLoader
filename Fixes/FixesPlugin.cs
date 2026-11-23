@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using AolLoader;
@@ -15,9 +15,6 @@ namespace AolFixes
         public const string PluginId = "fixes";
         public const string ColorPickerMagnifierFixKey = "color_picker_magnifier_fix";
         public const string ColorPickerModeKey = "color_picker_sampling_mode";
-        public const string SettingForceSyncFontEnum = "force_sync_font_enum";
-        public const string SettingCanvaSignInHelper = "canva_sign_in_helper";
-        public const string SettingCommandLineFileOpen = "command_line_file_open";
         public const string SettingPinPluginHost = "pin_plugin_host";
         public const string SettingContextBarItemStyle = "context_bar_item_style_fix";
         public const string SettingSubToolColumns = "sub_tool_columns_fix";
@@ -27,10 +24,6 @@ namespace AolFixes
         {
             return new PluginSettingsDefinition(PluginId)
                 .AddSection("Patches")
-                .AddBool(SettingCanvaSignInHelper, "Canva sign-in helper",
-                    defaultValue: true,
-                    restartRequired: true,
-                    description: "Patch the Canva sign-in dialog to include a helper textbox input and instructions to complete Canva sign-in without needing a protocol URL handler.")
                 .AddEnum(ColorPickerMagnifierFixKey, "Color picker: Wayland zoom magnifier fix",
                     new List<EnumOption>
                     {
@@ -49,10 +42,6 @@ namespace AolFixes
                     },
                     defaultValue: "native",
                     description: "- **Native:** Use Affinity's built-in color sampling. Colors sampled within the canvas bounds will use the native document color space, but the color of the highlighted pixel in the zoom preview may differ slightly from the actual color value sampled.\n- **Exact:** Pick the exact color of the highlighted pixel in the zoom preview. Samples from a screen capture in sRGB rather than the document's native color space. May be more intuitive, but not recommended when editing documents using CMYK or wide-gamut color spaces.")
-                .AddBool(SettingCommandLineFileOpen, "Command-line file opening fix",
-                    defaultValue: true,
-                    restartRequired: true,
-                    description: "Fix opening files from the command line or desktop file manager.")
                 .AddBool(SettingContextBarItemStyle, "Context toolbar: Fix empty Leading dropdown",
                     defaultValue: true,
                     restartRequired: true,
@@ -66,10 +55,6 @@ namespace AolFixes
                     restartRequired: true,
                     description: "Affinity's package check throws under Wine, which stops it saving preferences on exit. Answer the check with \"no previous package\" instead. On Affinity 3.2.3 this opens the WebView2 onboarding page, which crashes; turn it off there.")
                 .AddSection("Crash Fixes")
-                .AddBool(SettingForceSyncFontEnum, "Force synchronous font enumeration",
-                    defaultValue: true,
-                    restartRequired: true,
-                    description: "Disable parallel font enumeration to significantly reduce frequency of startup crashes. May increase application startup time on systems with lots of fonts.")
                 .AddBool(SettingPinPluginHost, "Keep the plugin host loaded",
                     defaultValue: true,
                     restartRequired: true,
@@ -90,14 +75,6 @@ namespace AolFixes
 
         public override void OnPatch(Harmony harmony, IPluginContext context)
         {
-            // Fix command-line file opening (WinRT TypeLoadException workaround)
-            if (context.Settings.GetEffectiveValue<bool>(SettingCommandLineFileOpen))
-            {
-                context.Patch("CommandLineFileOpen fix",
-                    h => Patches.CommandLineFileOpenPatch.ApplyPatches(h));
-            }
-
-
             if (context.Settings.GetEffectiveValue<bool>(SettingMainWindowLoaded))
             {
                 context.Patch("MainWindowLoaded fix",
@@ -128,12 +105,6 @@ namespace AolFixes
                 Logger.Info("Skipping SubToolColumns fix (setting: disabled)");
             }
 
-            if (context.Settings.GetEffectiveValue<bool>(SettingForceSyncFontEnum))
-            {
-                context.Patch("FontEnumeration fix",
-                    h => Patches.FontEnumerationPatch.ApplyPatches(h));
-            }
-
             var magnifierFix = context.Settings.GetEffectiveValue<string>(ColorPickerMagnifierFixKey);
             bool applyMagnifierFix = magnifierFix == "enabled" ||
                 (magnifierFix == "auto" && IsWaylandSession());
@@ -146,16 +117,6 @@ namespace AolFixes
             else
             {
                 Logger.Info("Skipping ColorPicker Wayland fix (setting: " + magnifierFix + ")");
-            }
-
-            if (context.Settings.GetEffectiveValue<bool>(SettingCanvaSignInHelper))
-            {
-                context.Patch("Canva sign-in paste URL fix",
-                    h => Patches.CanvaSignInPatch.ApplyPatches(h));
-            }
-            else
-            {
-                Logger.Info("Skipping Canva sign-in helper (disabled in settings)");
             }
         }
 

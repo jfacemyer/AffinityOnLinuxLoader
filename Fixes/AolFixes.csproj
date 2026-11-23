@@ -34,9 +34,6 @@
     <Reference Include="System.Xaml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\signin.png" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Loader\AolLoader.csproj">
       <Project>{0B4B2B01-D160-40EE-A9AC-9594470DDBC3}</Project>
       <Name>AolLoader</Name>
