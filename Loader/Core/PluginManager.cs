@@ -285,10 +285,16 @@ namespace AolLoader.Core
                 try
                 {
                     var plugin = (AffinityPlugin)Activator.CreateInstance(pluginType);
+
+                    // A plugin with settings names its own id, which its
+                    // settings file, its environment overrides and its own
+                    // GetSettingsStore calls use; key everything by it.
+                    var settingsDef = plugin.DefineSettings();
+                    if (settingsDef != null && !string.IsNullOrEmpty(settingsDef.PluginId))
+                        pluginInfo.PluginId = pluginId = settingsDef.PluginId;
                     _pluginInstances[pluginId] = plugin;
 
                     // Wire up settings immediately (before OnLoad)
-                    var settingsDef = plugin.DefineSettings();
                     if (settingsDef != null)
                         RegisterSettings(pluginId, settingsDef);
 

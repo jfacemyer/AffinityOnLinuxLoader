@@ -12,9 +12,9 @@
     <Product>Affinity on Linux loader</Product>
     <AssemblyName>aol-loader</AssemblyName>
     <RootNamespace>AolLoader</RootNamespace>
-    <Description>Loads the Affinity on Linux fixes into Affinity. Based on AffinityPluginLoader by Noah Curoe.</Description>
-    <Version>1.0.0</Version>
-    <Company>Noah Curoe &amp; the loader Contributors</Company>
+    <Description>Loads the Affinity on Linux fixes into Affinity. Maintained by Joshua Facemyer for the Affinity on Linux project. Based on AffinityPluginLoader by Noah Curoe, with contributions from Micah Lindley.</Description>
+    <Version>1.0.1</Version>
+    <Company>Joshua Facemyer, based on AffinityPluginLoader by Noah Curoe</Company>
     <!-- Disable git hash in Release builds -->
     <IncludeSourceRevisionInInformationalVersion Condition="'$(Configuration)' == 'Release'">false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>

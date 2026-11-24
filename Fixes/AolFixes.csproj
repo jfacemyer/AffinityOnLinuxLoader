@@ -12,9 +12,9 @@
     <Product>Affinity on Linux fixes</Product>
     <AssemblyName>aol-fixes</AssemblyName>
     <RootNamespace>AolFixes</RootNamespace>
-    <Description>Plugin to fix Wine compatibility issues in Affinity applications</Description>
-    <Version>1.0.0</Version>
-    <Company>Noah Curoe, WineFix and Affinity on Linux contributors</Company>
+    <Description>Fixes for Affinity under Wine that correct Affinity's own code. The Leading dropdown, sub-tool panel and plugin host fixes, and the repairs to the color picker, are by Joshua Facemyer. The color picker magnifier and the save-preferences-on-exit fix come from Noah Curoe's WineFix.</Description>
+    <Version>1.0.1</Version>
+    <Company>Joshua Facemyer and Noah Curoe</Company>
     <!-- Disable git hash in Release builds -->
     <IncludeSourceRevisionInInformationalVersion Condition="'$(Configuration)' == 'Release'">false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
