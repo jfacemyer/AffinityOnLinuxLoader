@@ -9,6 +9,7 @@ This plugin began as WineFix by Noah Curoe.
 - **Color picker under Wayland**: the picker's zoom preview showed a black image. The magnifier captures through Wine's window capture instead of the screen. Also: the pick ends when Affinity loses focus, the capture is taken again once the overlay is hidden, and a timer that outlived its window is stopped.
 - **Empty Leading dropdown** (Affinity 3.3): the text context toolbar's Leading list opened with nothing in it. Its items get the standard dropdown item style.
 - **Sub-tool panel columns**: after a studio switch the shape tools came back as one column running the height of the window. The panel's own column rule is put back.
+- **Tab into number fields**: Tab and Shift-Tab into a field such as the Transform panel's X or W gave it a focus ring but left the value unselected. The field starts editing, so its value comes up selected, as on a click.
 - **Plugin host pin**: Affinity frees its plugin host (`libplugins.dll`) during a session and later calls back into it, crashing with an access violation. A reference to the module keeps the released code mapped.
 - **Preferences saved on exit**: on older Affinity 3 releases, a package check threw under Wine and stopped Affinity saving its preferences. The check is answered with "no previous package". Affinity 3.3.3 no longer makes the call, and the fix then changes nothing. Turn it off on Affinity 3.2.3, where it opens a WebView2 page that crashes.
 

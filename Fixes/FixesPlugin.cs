@@ -19,6 +19,7 @@ namespace AolFixes
         public const string SettingContextBarItemStyle = "context_bar_item_style_fix";
         public const string SettingSubToolColumns = "sub_tool_columns_fix";
         public const string SettingMainWindowLoaded = "main_window_loaded_fix";
+        public const string SettingUnitEditorTabSelect = "number_field_tab_select_fix";
 
         public override PluginSettingsDefinition DefineSettings()
         {
@@ -50,6 +51,10 @@ namespace AolFixes
                     defaultValue: true,
                     restartRequired: true,
                     description: "A studio switch gives the sub-tool panel the main tool pane's column count, so with a one-column tool pane the shape tools come back as one column running the height of the window until the next tool change. Put back the sub-tool panel's own rule (two columns for more than ten sub-tools) after a studio switch.")
+                .AddBool(SettingUnitEditorTabSelect, "Number fields: Select the value on Tab",
+                    defaultValue: true,
+                    restartRequired: true,
+                    description: "Tab and Shift-Tab into a number field, such as those in the Transform panel, only put a focus ring on it: the value is not selected, though typing still replaces it. Start editing the field instead, so its value comes up selected, as it does on a click.")
                 .AddBool(SettingMainWindowLoaded, "Settings: Save preferences on exit",
                     defaultValue: true,
                     restartRequired: true,
@@ -118,6 +123,14 @@ namespace AolFixes
             {
                 Logger.Info("Skipping ColorPicker Wayland fix (setting: " + magnifierFix + ")");
             }
+        }
+
+        public override void OnUiReady(IPluginContext context)
+        {
+            if (context.Settings.GetEffectiveValue<bool>(SettingUnitEditorTabSelect))
+                Patches.UnitEditorTabSelectPatch.Apply();
+            else
+                Logger.Info("Skipping number field Tab fix (setting: disabled)");
         }
 
         /// <summary>
